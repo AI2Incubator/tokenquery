@@ -80,16 +80,15 @@ class StateMachine:
     # exuastive search
     def runAll(self, inputs, start=0):
         captured_dictionary = {}
-        captured_info_item = []
         capture_name = self.currentState.capture_name
         curser = start
         # Stack
-        stack = [(self.currentState, curser, captured_dictionary, captured_info_item, capture_name)]
+        stack = [(self.currentState, curser, captured_dictionary, curser, capture_name)]
         groups = []
 
         # push down automata
         while stack and len(stack) < self.max_stack_size:
-            currentState, curser, captured_dictionary, captured_info_item, capture_name = stack.pop()
+            currentState, curser, captured_dictionary, match_start, capture_name = stack.pop()
             # print (currentState, curser, captured_dictionary, captured_info_item)
             # if captured_info_item:
             #     print ('capturer : ', ' '.join([token.get_text() for token in captured_info_item]))
@@ -102,34 +101,24 @@ class StateMachine:
                 if nexts:
                     for next in nexts:
                         if next.is_final:
-                            if captured_info_item:
-                                captured_dictionary[capture_name] = captured_info_item
+                            if capture_name:
+                                captured_dictionary[capture_name] = inputs[match_start:curser]
+                                match_start = curser
                             if captured_dictionary not in groups:
                                 groups.append(captured_dictionary)
                         else:
                             # print (token.get_text(), capture_name, next.capture_name, captured_info_item)
-                            if next.capture_name and not capture_name:
-                                # starting mode
-                                if token not in captured_info_item:
-                                    captured_info_item.append(token)
-
-                            elif next.capture_name and next.capture_name == capture_name:
-                                if token not in captured_info_item:
-                                    captured_info_item.append(token)
-
-                            elif next.capture_name != capture_name:
-                                if captured_info_item:
-                                    captured_dictionary[capture_name] = captured_info_item
-                                    captured_info_item = []
-                                if next.capture_name:
-                                    captured_info_item.append(token)
+                            if next.capture_name != capture_name:
+                                if capture_name:
+                                    captured_dictionary[capture_name] = inputs[match_start:curser]
+                                match_start = curser
 
                             capture_name = next.capture_name
-                            stack.append((next, curser+1, captured_dictionary, captured_info_item, capture_name))
+                            stack.append((next, curser+1, captured_dictionary, match_start, capture_name))
             else:
                 if currentState.is_final:
-                    if captured_info_item:
-                        captured_dictionary[capture_name] = captured_info_item
+                    if capture_name:
+                        captured_dictionary[capture_name] = inputs[match_start:curser]
                     if captured_dictionary:
                         if captured_dictionary not in groups:
                             groups.append(captured_dictionary)

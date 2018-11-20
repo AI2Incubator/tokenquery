@@ -23,6 +23,7 @@ class TestTokenQueryClass(unittest.TestCase):
                 self.assertIn(chunk_name, desired_group)
                 chunk = group[chunk_name]
                 desired_chunk = desired_group[chunk_name]
+                self.assertEqual(len(chunk), len(desired_chunk))
                 for token, desired_token in zip(chunk, desired_chunk):
                     self.assertEqual(token.get_token_id(), desired_token.get_token_id())
 
@@ -109,6 +110,10 @@ class TestTokenQueryClass(unittest.TestCase):
                                 {'chunk 1': input_tokens[11:13]},  # Sir Isaac
                                 {'chunk 1': input_tokens[13:14]}]  # Newton
                                )
+
+        # Test backtracking
+        test_cases += ['[str_eq(David)] [!str_reg(\.+)]* [str_eq(Ramtin)]']
+        desired_results.append([{'chunk 1': input_tokens[0:6]}]) # David is a painter and Ramtin
 
         # test range repetition
         # test_cases += ['[ner:str_eq(PERSON)]{1,3} [pos:str_eq(VBZ)]']

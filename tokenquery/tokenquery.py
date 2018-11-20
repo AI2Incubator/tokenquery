@@ -30,8 +30,7 @@ class TokenQuery:
         for start_point in range(len(input_tokens)):
             # skip from the matched ones
             if start_point > last_matched:
-                sub_input_tokens = input_tokens[start_point:]
-                result_set = self.machine.runAll(sub_input_tokens)
+                result_set = self.machine.runAll(input_tokens, start=start_point)
                 if result_set:
                     final_results += result_set
                     for result_item in result_set:

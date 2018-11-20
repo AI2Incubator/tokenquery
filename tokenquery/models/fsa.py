@@ -78,11 +78,11 @@ class StateMachine:
                 print (cond, ' ---> ', next.state_name)
 
     # exuastive search
-    def runAll(self, inputs):
+    def runAll(self, inputs, start=0):
         captured_dictionary = {}
         captured_info_item = []
         capture_name = self.currentState.capture_name
-        curser = 0
+        curser = start
         # Stack
         stack = [(self.currentState, curser, captured_dictionary, captured_info_item, capture_name)]
         groups = []
